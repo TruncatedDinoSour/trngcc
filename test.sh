@@ -79,6 +79,21 @@ test_tcc() {
     fi
 }
 
+run_binaries() {
+    for bin in "$OUTDIR"/*; do
+        {
+            log "Running \033[1m$bin\033[0m\n" printf
+
+            if ! ./"$bin" >/dev/null 2>&1; then
+                log "\033[1;31mBinary '$bin' failed\033[0m\n" printf >&2
+                exit 3
+            fi
+        } &
+    done
+
+    wait
+}
+
 main() {
     rm -rf -- "$OUTDIR"
     mkdir -p -- "$OUTDIR"
@@ -95,6 +110,9 @@ main() {
                 awk -F . '{if (NF>1) {print $NF}}')"
         done
     done
+
+    log 'Running binaries'
+    run_binaries
 }
 
 main "$@"
